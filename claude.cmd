@@ -3,10 +3,10 @@ setlocal
 
 set "SHIM_DIR=%~dp0"
 
-where python >nul 2>nul
+where bash >nul 2>nul
 if errorlevel 1 (
-    echo ERROR: python not found. Install Python and ensure it is in PATH.
+    echo ERROR: bash not found. Install Git for Windows and ensure it is in PATH.
     exit /b 1
 )
 
-python "%SHIM_DIR%claude-shim.py" %*
+bash "%SHIM_DIR%claude-shim.sh" %*
