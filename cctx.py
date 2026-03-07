@@ -150,6 +150,28 @@ def cmd_unlink(args):
     print(f"Unlinked '{args.file}' in profile '{args.profile}' (copied from {real_file})")
 
 
+def cmd_link(args):
+    if not profile_exists(args.profile):
+        die(f"Profile '{args.profile}' not found")
+    if not profile_exists(args.target):
+        die(f"Target profile '{args.target}' not found")
+
+    link_target = PROFILES_DIR / args.target / args.file
+    if not link_target.exists():
+        die(f"'{args.file}' does not exist in target profile '{args.target}'")
+
+    src = PROFILES_DIR / args.profile / args.file
+    if src.is_symlink() and src.resolve() == link_target.resolve():
+        print(f"'{args.file}' in profile '{args.profile}' is already linked to '{args.target}'")
+        return
+
+    if src.exists() or src.is_symlink():
+        src.unlink()
+
+    src.symlink_to(link_target.resolve())
+    print(f"Linked '{args.file}' in profile '{args.profile}' -> {link_target.resolve()}")
+
+
 def cmd_list(args):
     print("Profiles:")
     for p in sorted(p.name for p in PROFILES_DIR.iterdir() if p.is_dir()):
@@ -196,6 +218,12 @@ def main():
     p_unlink.add_argument('profile', help='Profile name')
     p_unlink.add_argument('file', help='File name')
     p_unlink.set_defaults(func=cmd_unlink)
+
+    p_link = sub.add_parser('link', help='Replace a file in a profile with a symlink to another profile\'s copy')
+    p_link.add_argument('profile', help='Profile name')
+    p_link.add_argument('file', help='File name')
+    p_link.add_argument('target', metavar='TARGET_PROFILE', help='Profile to symlink from')
+    p_link.set_defaults(func=cmd_link)
 
     p_list = sub.add_parser('list', help='List all profiles')
     p_list.set_defaults(func=cmd_list)
