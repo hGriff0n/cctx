@@ -22,15 +22,14 @@ cctx manages a `~/.claude/profiles/` directory. Each profile is a folder of conf
 
 ## Requirements
 
-- [jq](https://jqlang.github.io/jq/)
-- **Windows**: [Git for Windows](https://git-scm.com/download/win) (provides bash) + [Developer Mode enabled](ms-settings:developers) (required for symlinks)
-- **macOS/Linux**: bash 4+
+- Python 3.8+
+- **Windows**: [Developer Mode enabled](ms-settings:developers) (required for symlinks)
 
 ## Install
 
 ```bash
 # Clone or copy this repo, then:
-bash install.sh        # macOS/Linux
+python3 install.py     # macOS/Linux (or: bash install.sh)
 install.cmd            # Windows (from CMD/PowerShell)
 ```
 
@@ -108,6 +107,6 @@ cctx unlink myprofile some-shared-file.md
 
 ## Windows notes
 
-The `.cmd` wrappers (`install.cmd`, `cctx.cmd`) call the corresponding `.sh` scripts via bash. Once installed, `cctx` and `claude` work from CMD, PowerShell, and Git Bash.
+The `.cmd` wrappers (`install.cmd`, `cctx.cmd`, `claude.cmd`) call the corresponding `.py` scripts via Python. Once installed, `cctx` and `claude` work from CMD, PowerShell, and Git Bash.
 
 Symlinks on Windows require Developer Mode. The installer checks for this and exits early with instructions if symlinks aren't available.
