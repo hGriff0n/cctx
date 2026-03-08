@@ -25,7 +25,7 @@ cctx manages a `~/.claude/profiles/` directory. Each profile is a folder of conf
 - Python 3.8+
 - **Windows**: [Developer Mode enabled](ms-settings:developers) (required for symlinks)
 
-## Install
+## Install / Update
 
 ```bash
 # Clone or copy this repo, then:
@@ -68,16 +68,12 @@ cctx create <profile> [--base <profile>] [--use_symlink]
     --use_symlink      Symlink files from base instead of copying.
                        CLAUDE.md and settings.json are always copied.
 
-cctx managed
+cctx managed [--add <path>] [--remove <path>]
     List files tracked across all profiles.
-
-cctx managed --add <path>
-    Start tracking a file. Path is relative to ~/.claude/.
-    The file is moved to the default profile; symlinks are created
-    in all other profiles.
-
-cctx managed --remove <path>
-    Stop tracking a file (cannot remove CLAUDE.md or settings.json).
+    --add <path>       Adds a file to the managed list and creates the symlinks. Path is relative to ~/.claude/.
+    --remove <path>    Revert --add: restore the file from the default profile back to
+                       ~/.claude/ and remove it from all profiles. Prompts if profiles
+                       have diverged. Cannot remove CLAUDE.md or settings.json.
 
 cctx set <profile>
     Activate a profile by updating symlinks in ~/.claude/ to point to that profile's files.

@@ -121,9 +121,57 @@ def cmd_managed(args):
         managed = settings.get('managed_files', [])
         if path not in managed:
             die(f"'{path}' is not in managed_files")
+
+        # Collect profiles with a real (non-symlinked) copy of the file
+        real_copies = {}
+        for profile_dir in sorted(PROFILES_DIR.iterdir()):
+            if not profile_dir.is_dir():
+                continue
+            f = profile_dir / path
+            if f.exists() and not f.is_symlink():
+                real_copies[profile_dir.name] = f
+
+        if not real_copies:
+            die(f"No real copy of '{path}' found in any profile; cannot revert")
+
+        if len(real_copies) == 1:
+            src_profile, src_file = next(iter(real_copies.items()))
+        else:
+            # Check if all real copies are identical
+            contents = {name: f.read_bytes() for name, f in real_copies.items()}
+            unique = set(contents.values())
+            if len(unique) == 1:
+                src_profile, src_file = next(iter(real_copies.items()))
+            else:
+                print(f"WARNING: Multiple profiles have different real copies of '{path}':")
+                for name in sorted(real_copies):
+                    print(f"  {name}")
+                print("Restoring will discard all but one version.")
+                answer = input("Continue? [y/N] ").strip().lower()
+                if answer != 'y':
+                    print("Aborted.")
+                    return
+                chosen = input(f"Which profile's version to restore? [{'/'.join(sorted(real_copies))}] ").strip()
+                if chosen not in real_copies:
+                    die(f"Unknown profile '{chosen}'")
+                src_profile, src_file = chosen, real_copies[chosen]
+
+        live_link = CLAUDE_DIR / path
+        if live_link.is_symlink() or live_link.exists():
+            live_link.unlink()
+        shutil.move(str(src_file), live_link)
+        print(f"Restored {path} from profile '{src_profile}' to {live_link}")
+
         managed.remove(path)
         write_settings(settings)
         print(f"Removed '{path}' from managed_files")
+
+        for profile_dir in sorted(PROFILES_DIR.iterdir()):
+            if not profile_dir.is_dir():
+                continue
+            f = profile_dir / path
+            if f.is_symlink() or f.exists():
+                f.unlink()
 
     else:
         print("Managed files:")
