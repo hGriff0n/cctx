@@ -37,19 +37,7 @@ if [[ ! -d "$profile_dir" ]]; then
 fi
 
 # Load profile by updating symlinks
-if [[ -f "$SETTINGS_FILE" ]] && command -v jq &>/dev/null; then
-    managed_files=$(jq -r '.managed_files[]' "$SETTINGS_FILE")
-    while IFS= read -r file; do
-        link="$CLAUDE_DIR/$file"
-        target="$profile_dir/$file"
-
-        # Only update if target exists in the profile
-        if [[ -e "$target" || -L "$target" ]]; then
-            rm -f "$link"
-            ln -s "$target" "$link"
-        fi
-    done <<< "$managed_files"
-fi
+cctx set "$profile"
 
 # Transfer to real claude
 exec "$REAL_CLAUDE" "$@"

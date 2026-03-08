@@ -79,6 +79,9 @@ cctx managed --add <path>
 cctx managed --remove <path>
     Stop tracking a file (cannot remove CLAUDE.md or settings.json).
 
+cctx set <profile>
+    Activate a profile by updating symlinks in ~/.claude/ to point to that profile's files.
+
 cctx link <profile> <file> <target>
     Replace a local file in a profile with a symlink to the same file in a different profile.
 

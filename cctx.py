@@ -174,6 +174,22 @@ def cmd_link(args):
     print(f"Linked '{args.file}' in profile '{args.profile}' -> {link_target.resolve()}")
 
 
+def cmd_set(args):
+    if not profile_exists(args.profile):
+        die(f"Profile '{args.profile}' not found")
+
+    profile_dir = PROFILES_DIR / args.profile
+    for f in get_managed_files():
+        link = CLAUDE_DIR / f
+        target = profile_dir / f
+        if target.exists() or target.is_symlink():
+            if link.exists() or link.is_symlink():
+                link.unlink()
+            link.symlink_to(target)
+
+    print(f"Switched to profile '{args.profile}'")
+
+
 def cmd_list(args):
     if args.managed:
         print("Managed files:")
@@ -250,6 +266,10 @@ def main():
     p_create.add_argument('--use_symlink', action='store_true',
                           help='Symlink files from base instead of copying (CLAUDE.md and settings.json are always copied)')
     p_create.set_defaults(func=cmd_create)
+
+    p_set = sub.add_parser('set', help='Activate a profile by updating symlinks in ~/.claude/')
+    p_set.add_argument('profile', help='Profile name')
+    p_set.set_defaults(func=cmd_set)
 
     p_managed = sub.add_parser('managed', help='Manage tracked files across profiles')
     p_managed.add_argument('--add', metavar='PATH', help='Add a file to managed list')

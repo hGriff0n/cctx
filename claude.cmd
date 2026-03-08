@@ -39,22 +39,8 @@ if not exist "%profile_dir%\" (
     exit /b 1
 )
 
-@REM TODO: This requires administrator permissions on windows
-@REM Possible to create symlinks in install and copy them over? Wouldn't need to handle windows/linux split
 :: Load profile by updating symlinks
-if exist "%SETTINGS_FILE%" (
-    where jq >nul 2>nul
-    if not errorlevel 1 (
-        for /f "delims=" %%f in ('jq -r ".managed_files[]" "%SETTINGS_FILE%"') do (
-            set "link=%CLAUDE_DIR%\%%f"
-            set "target=%profile_dir%\%%f"
-            if exist "!target!" (
-                if exist "!link!" del /f "!link!" >nul 2>nul
-                mklink "!link!" "!target!" >nul 2>nul
-            )
-        )
-    )
-)
+cctx set "%profile%"
 
 :: Transfer to real claude
 "%REAL_CLAUDE%" %*
