@@ -192,6 +192,43 @@ def cmd_current(args):
     print(profile)
 
 
+def cmd_resolve(args):
+    profiles = [p for p in PROFILES_DIR.iterdir() if p.is_dir()]
+
+    # Pass 1: collect union of all enabledPlugins keys from non-symlinked settings
+    union = {}
+    for profile_dir in profiles:
+        s = profile_dir / 'settings.json'
+        if s.is_symlink() or not s.exists():
+            continue
+        data = json.loads(s.read_text())
+        for key in data.get('enabledPlugins', {}):
+            union[key] = union.get(key, False)
+
+    if not union:
+        print("No enabledPlugins found across any profile.")
+        return
+
+    print(f"Plugin union ({len(union)}): {', '.join(sorted(union))}")
+
+    # Pass 2: update each non-symlinked settings.json with any missing plugins
+    for profile_dir in sorted(profiles, key=lambda p: p.name):
+        s = profile_dir / 'settings.json'
+        if s.is_symlink() or not s.exists():
+            print(f"  {profile_dir.name}: skipped (symlink or missing)")
+            continue
+        data = json.loads(s.read_text())
+        enabled = data.setdefault('enabledPlugins', {})
+        added = [k for k in union if k not in enabled]
+        for k in added:
+            enabled[k] = False
+        if added:
+            s.write_text(json.dumps(data, indent=2))
+            print(f"  {profile_dir.name}: added {added}")
+        else:
+            print(f"  {profile_dir.name}: up to date")
+
+
 # --- Main ---
 
 def main():
@@ -230,6 +267,9 @@ def main():
 
     p_current = sub.add_parser('current', help='Show which profile the current directory would use')
     p_current.set_defaults(func=cmd_current)
+
+    p_resolve = sub.add_parser('resolve', help='Sync enabledPlugins across all non-symlinked profiles')
+    p_resolve.set_defaults(func=cmd_resolve)
 
     args = parser.parse_args()
     args.func(args)
