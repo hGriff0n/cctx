@@ -42,6 +42,8 @@ def profile_exists(name):
 
 # --- Commands ---
 
+# TODO: Definitely need to log/reroute output
+# TODO: Create empty CLAUDE if doesn't exist
 def cmd_create(args):
     if not profile_exists(args.base):
         die(f"Base profile '{args.base}' not found")
@@ -178,18 +180,17 @@ def cmd_list(args):
         print(f"  {p}")
 
 
-def cmd_current(args):
-    profile = 'default'
+def current_profile():
     local_settings = Path.cwd() / '.claude' / 'settings.local.json'
     if local_settings.exists():
         try:
             data = json.loads(local_settings.read_text())
             p = data.get('profile', '').strip()
             if p:
-                profile = p
+                return p
         except (json.JSONDecodeError, OSError):
             pass
-    print(profile)
+    return 'default'
 
 
 def cmd_resolve(args):
@@ -236,7 +237,6 @@ def main():
 
     parser = argparse.ArgumentParser(prog='cctx', description='Claude Code context/profile manager')
     sub = parser.add_subparsers(dest='command')
-    sub.required = True
 
     p_create = sub.add_parser('create', help='Create a new profile')
     p_create.add_argument('profile', help='Profile name')
@@ -265,13 +265,15 @@ def main():
     p_list = sub.add_parser('list', help='List all profiles')
     p_list.set_defaults(func=cmd_list)
 
-    p_current = sub.add_parser('current', help='Show which profile the current directory would use')
-    p_current.set_defaults(func=cmd_current)
-
     p_resolve = sub.add_parser('resolve', help='Sync enabledPlugins across all non-symlinked profiles')
     p_resolve.set_defaults(func=cmd_resolve)
 
     args = parser.parse_args()
+    if not args.command:
+        parser.print_help()
+        print()
+        print(f"Current Active Profile: {current_profile()}")
+        return
     args.func(args)
 
 

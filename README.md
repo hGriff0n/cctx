@@ -55,11 +55,11 @@ Now `claude` in that directory will automatically load the `work` profile.
 ### cctx commands
 
 ```
+cctx
+    Prints help and shows the active profile for the current directory
+
 cctx list
     List all available profiles.
-
-cctx current
-    Show which profile the current directory would use.
 
 cctx create <profile> [--base <profile>] [--use_symlink]
     Create a new profile copied from a base profile (default: "default").
