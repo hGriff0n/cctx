@@ -58,8 +58,9 @@ Now `claude` in that directory will automatically load the `work` profile.
 cctx
     Prints help and shows the active profile for the current directory
 
-cctx list
+cctx list [--managed]
     List all available profiles.
+    --managed          List files tracked across all profiles.
 
 cctx create <profile> [--base <profile>] [--use_symlink]
     Create a new profile copied from a base profile (default: "default").

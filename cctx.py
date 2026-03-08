@@ -175,9 +175,14 @@ def cmd_link(args):
 
 
 def cmd_list(args):
-    print("Profiles:")
-    for p in sorted(p.name for p in PROFILES_DIR.iterdir() if p.is_dir()):
-        print(f"  {p}")
+    if args.managed:
+        print("Managed files:")
+        for f in get_managed_files():
+            print(f"  {f}")
+    else:
+        print("Profiles:")
+        for p in sorted(p.name for p in PROFILES_DIR.iterdir() if p.is_dir()):
+            print(f"  {p}")
 
 
 def current_profile():
@@ -262,7 +267,8 @@ def main():
     p_link.add_argument('target', metavar='TARGET_PROFILE', help='Profile to symlink from')
     p_link.set_defaults(func=cmd_link)
 
-    p_list = sub.add_parser('list', help='List all profiles')
+    p_list = sub.add_parser('list', help='List all profiles (or managed files with --managed)')
+    p_list.add_argument('--managed', action='store_true', help='List managed files instead of profiles')
     p_list.set_defaults(func=cmd_list)
 
     p_resolve = sub.add_parser('resolve', help='Sync enabledPlugins across all non-symlinked profiles')
