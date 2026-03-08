@@ -86,32 +86,35 @@ done <<< "$managed_files"
 # 4. Install the claude shim
 echo "Installing claude shim..."
 
+# TODO: https://github.com/hGriff0n/cctx/issues/1
+# Claude seems to have validation that forces "claude.exe" to exist
+# Specific error is "Install method is native but claude command not found"
+# In the meantime I'm just changing the shim to `cclaude`
 # Back up the real claude binary
-if [[ -f "$REAL_CLAUDE" && ! -L "$REAL_CLAUDE" ]]; then
-    REAL_EXT=""
-    [[ "$REAL_CLAUDE" == *.exe ]] && REAL_EXT=".exe"
-    BACKUP="$LOCAL_BIN/claude-real${REAL_EXT}"
+# if [[ -f "$REAL_CLAUDE" && ! -L "$REAL_CLAUDE" ]]; then
+#     REAL_EXT=""
+#     [[ "$REAL_CLAUDE" == *.exe ]] && REAL_EXT=".exe"
+#     BACKUP="$LOCAL_BIN/claude-real${REAL_EXT}"
 
-    if [[ ! -f "$BACKUP" ]]; then
-        mv "$REAL_CLAUDE" "$BACKUP"
-        echo "  Backed up claude -> $BACKUP"
-    else
-        echo "  Backup already exists at $BACKUP"
-        rm -f "$REAL_CLAUDE"
-    fi
-elif [[ -L "$REAL_CLAUDE" ]]; then
-    echo "  claude is already a symlink, removing"
-    rm -f "$REAL_CLAUDE"
-fi
+#     if [[ ! -f "$BACKUP" ]]; then
+#         mv "$REAL_CLAUDE" "$BACKUP"
+#         echo "  Backed up claude -> $BACKUP"
+#     else
+#         echo "  Backup already exists at $BACKUP"
+#         rm -f "$REAL_CLAUDE"
+#     fi
+# elif [[ -L "$REAL_CLAUDE" ]]; then
+#     echo "  claude is already a symlink, removing"
+#     rm -f "$REAL_CLAUDE"
+# fi
 
 if $IS_WINDOWS; then
-    cp "$SHIM_SOURCE" "$LOCAL_BIN/claude-shim.sh"
-    cp "$SCRIPT_DIR/claude.cmd" "$LOCAL_BIN/claude.cmd"
-    echo "  Installed claude.cmd + claude-shim.sh"
+    cp "$SCRIPT_DIR/claude.cmd" "$LOCAL_BIN/cclaude.cmd"
+    echo "  Installed claude.cmd"
 else
-    cp "$SHIM_SOURCE" "$LOCAL_BIN/claude"
-    chmod +x "$LOCAL_BIN/claude"
-    echo "  Installed shim at $LOCAL_BIN/claude"
+    cp "$SHIM_SOURCE" "$LOCAL_BIN/cclaude"
+    chmod +x "$LOCAL_BIN/cclaude"
+    echo "  Installed shim at $LOCAL_BIN/cclaude"
 fi
 
 # 5. Install cctx command

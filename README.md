@@ -4,7 +4,7 @@ Profile support for [Claude Code](https://claude.ai/claude-code). Switch between
 
 ## How it works
 
-cctx manages a `~/.claude/profiles/` directory. Each profile is a folder of config files. The `claude` shim checks for a `"profile"` field in the current project's `.claude/settings.local.json` and swaps the symlinks in `~/.claude/` to point to that profile before handing off to the real `claude` binary.
+cctx manages a `~/.claude/profiles/` directory. Each profile is a folder of config files. The `cclaude` shim checks for a `"profile"` field in the current project's `.claude/settings.local.json` and swaps the symlinks in `~/.claude/` to point to that profile before handing off to the real `claude` binary.
 
 ```
 ~/.claude/
@@ -29,14 +29,13 @@ cctx manages a `~/.claude/profiles/` directory. Each profile is a folder of conf
 
 ```bash
 # Clone or copy this repo, then:
-python3 install.py     # macOS/Linux (or: bash install.sh)
+install.sh             # macOS/Linux
 install.cmd            # Windows (from CMD/PowerShell)
 ```
 
 The installer:
 1. Creates `~/.claude/profiles/` and a `default` profile from your current `~/.claude` files
-2. Backs up your `claude` binary as `claude-real` (or `claude-real.exe`)
-3. Installs the shim as `claude` and the config manager as `cctx`
+2. Installs the shim as `cclaude` and the config manager as `cctx`
 
 ## Usage
 
@@ -79,6 +78,9 @@ cctx managed --add <path>
 cctx managed --remove <path>
     Stop tracking a file (cannot remove CLAUDE.md or settings.json).
 
+cctx link <profile> <file> <target>
+    Replace a local file in a profile with a symlink to the same file in a different profile.
+
 cctx unlink <profile> <file>
     Replace a symlinked file in a profile with a real independent copy.
 ```
@@ -98,6 +100,12 @@ cctx managed
 ## Profiles with shared files
 
 Use `--use_symlink` when creating a profile to share files from the base profile rather than copy them. Edits to the shared file affect all profiles that link to it. `CLAUDE.md` and `settings.json` are always given independent copies.
+
+You can additionally link specific files with:
+
+```bash
+cctx link myprofile some-shared-file.md target
+```
 
 To later make a symlinked file independent:
 

@@ -4,7 +4,9 @@ set -euo pipefail
 CLAUDE_DIR="$HOME/.claude"
 PROFILES_DIR="$CLAUDE_DIR/profiles"
 SETTINGS_FILE="$PROFILES_DIR/settings.json"
-REAL_CLAUDE="$HOME/.local/bin/claude-real"
+
+# TODO: https://github.com/hGriff0n/cctx/issues/1
+REAL_CLAUDE="$HOME/.local/bin/claude"
 
 # Fallback: check for .exe variant on Windows
 if [[ ! -f "$REAL_CLAUDE" && -f "${REAL_CLAUDE}.exe" ]]; then
