@@ -324,6 +324,9 @@ def main():
     p_managed.add_argument('--remove', metavar='PATH', help='Remove a file from managed list')
     p_managed.set_defaults(func=cmd_managed)
 
+    # TODO: This could be moved to a subcommand of `set`
+    # `cctx set <profile> --unlink <file>`
+    # Or maybe `cctx <profile> unlink <file>`
     p_unlink = sub.add_parser('unlink', help='Replace a symlinked file in a profile with a real copy')
     p_unlink.add_argument('profile', help='Profile name')
     p_unlink.add_argument('file', help='File name')

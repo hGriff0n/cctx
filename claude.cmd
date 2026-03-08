@@ -40,7 +40,7 @@ if not exist "%profile_dir%\" (
 )
 
 :: Load profile by updating symlinks
-cctx set "%profile%"
+call cctx set "%profile%"
 
 :: Transfer to real claude
 "%REAL_CLAUDE%" %*
